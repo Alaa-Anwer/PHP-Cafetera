@@ -89,7 +89,7 @@ $success = $_GET["success"] ?? null;
 
             <!-- Remember + Forgot -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="#" class="forgot-link">Forgot Password?</a>
+                <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
             </div>
 
             <!-- Login Button -->

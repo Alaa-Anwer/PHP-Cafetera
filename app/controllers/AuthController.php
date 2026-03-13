@@ -158,5 +158,95 @@ class AuthController {
 
         // Render view is handled by add_user.php
     }
+
+    public function forgotPassword() {
+        require_once __DIR__ . "/../config/Database.php";
+        require_once __DIR__ . "/../models/User.php";
+
+        $database = new Database();
+        $db = $database->connect();
+
+        // Process forgot password form
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $email = trim($_POST["email"] ?? "");
+
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                header("Location: /forgot-password?error=Please enter a valid email address");
+                exit();
+            }
+
+            $userModel = new User($db);
+            $user = $userModel->getByEmail($email);
+
+            if (!$user) {
+                header("Location: /forgot-password?error=No account found with this email address");
+                exit();
+            }
+
+            // Set session for password reset
+            $_SESSION["reset_email"] = $email;
+            header("Location: /reset-password?success=You can now reset your password");
+            exit();
+        }
+
+        // Render forgot password view
+        $error = $_GET["error"] ?? null;
+        $success = $_GET["success"] ?? null;
+        require_once __DIR__ . "/../views/auth/forgot_password.php";
+    }
+
+    public function resetPassword() {
+        require_once __DIR__ . "/../config/Database.php";
+        require_once __DIR__ . "/../models/User.php";
+
+        $database = new Database();
+        $db = $database->connect();
+
+        // Check if user has permission to reset password
+        if (!isset($_SESSION["reset_email"])) {
+            header("Location: /forgot-password?error=Please request password reset first");
+            exit();
+        }
+
+        $email = $_SESSION["reset_email"];
+        $userModel = new User($db);
+        $user = $userModel->getByEmail($email);
+
+        if (!$user) {
+            unset($_SESSION["reset_email"]);
+            header("Location: /forgot-password?error=User not found");
+            exit();
+        }
+
+        // Process reset password form
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $password = $_POST["password"] ?? "";
+            $confirm = $_POST["confirm_password"] ?? "";
+
+            if (strlen($password) < 8) {
+                header("Location: /reset-password?error=Password must be at least 8 characters");
+                exit();
+            }
+
+            if ($password !== $confirm) {
+                header("Location: /reset-password?error=Passwords do not match");
+                exit();
+            }
+
+            if ($userModel->updatePassword($user["id"], $password)) {
+                unset($_SESSION["reset_email"]);
+                header("Location: /login?success=Password reset successfully. Please login with your new password.");
+                exit();
+            } else {
+                header("Location: /reset-password?error=Failed to reset password");
+                exit();
+            }
+        }
+
+        // Render reset password view
+        $error = $_GET["error"] ?? null;
+        $success = $_GET["success"] ?? null;
+        require_once __DIR__ . "/../views/auth/reset_password.php";
+    }
 }
 ?>

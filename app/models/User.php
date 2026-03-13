@@ -69,6 +69,15 @@ class User
         $stmt->bindParam(":id", $id);
         return $stmt->execute();
     }
-    // Update user...
+
+    function updatePassword($id, $password)
+    {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $query = "UPDATE " . $this->table . " SET password = :password WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":password", $hashedPassword);
+        $stmt->bindParam(":id", $id);
+        return $stmt->execute();
+    }
 }
 ?>
