@@ -154,6 +154,131 @@ class OrderController
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllForAdmin(?string $fromDate = null, ?string $toDate = null)
+    {
+        $conditions = [];
+        $params = [];
+
+        if (!empty($fromDate)) {
+            $conditions[] = "DATE(o.created_at) >= ?";
+            $params[] = $fromDate;
+        }
+
+        if (!empty($toDate)) {
+            $conditions[] = "DATE(o.created_at) <= ?";
+            $params[] = $toDate;
+        }
+
+        $whereSql = empty($conditions) ? '' : ('WHERE ' . implode(' AND ', $conditions));
+
+        $stmt = $this->conn->prepare("
+            SELECT o.*, u.name as user_name, u.email as user_email, u.image as user_image, r.name as room_name
+            FROM orders o
+            LEFT JOIN users u ON o.user_id = u.id
+            LEFT JOIN rooms r ON o.room_id = r.id
+            {$whereSql}
+            ORDER BY o.created_at DESC
+        ");
+
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getItemsForOrders(array $orderIds)
+    {
+        if (empty($orderIds)) {
+            return [];
+        }
+
+        $orderIds = array_values(array_unique(array_map('intval', $orderIds)));
+        $placeholders = implode(',', array_fill(0, count($orderIds), '?'));
+
+        $stmt = $this->conn->prepare("
+            SELECT oi.*, p.name as product_name, p.image as product_image
+            FROM order_items oi
+            LEFT JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id IN ({$placeholders})
+            ORDER BY oi.order_id ASC, oi.id ASC
+        ");
+        $stmt->execute($orderIds);
+
+        $grouped = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $item) {
+            $orderId = (int)($item['order_id'] ?? 0);
+            if (!isset($grouped[$orderId])) {
+                $grouped[$orderId] = [];
+            }
+            $grouped[$orderId][] = $item;
+        }
+
+        return $grouped;
+    }
+
+    public function getUserChecksSummary(?string $fromDate = null, ?string $toDate = null)
+    {
+        $conditions = [];
+        $params = [];
+
+        if (!empty($fromDate)) {
+            $conditions[] = "DATE(o.created_at) >= ?";
+            $params[] = $fromDate;
+        }
+
+        if (!empty($toDate)) {
+            $conditions[] = "DATE(o.created_at) <= ?";
+            $params[] = $toDate;
+        }
+
+        $whereSql = empty($conditions) ? '' : ('WHERE ' . implode(' AND ', $conditions));
+
+        $stmt = $this->conn->prepare("
+            SELECT
+                u.id as user_id,
+                u.name as user_name,
+                u.email as user_email,
+                u.image as user_image,
+                COUNT(o.id) as orders_count,
+                COALESCE(SUM(o.total_price), 0) as total_spent
+            FROM users u
+            LEFT JOIN orders o ON o.user_id = u.id
+            {$whereSql}
+            GROUP BY u.id, u.name, u.email, u.image
+            HAVING COUNT(o.id) > 0
+            ORDER BY total_spent DESC, user_name ASC
+        ");
+
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserOrdersForChecks(int $userId, ?string $fromDate = null, ?string $toDate = null)
+    {
+        $conditions = ["o.user_id = ?"];
+        $params = [$userId];
+
+        if (!empty($fromDate)) {
+            $conditions[] = "DATE(o.created_at) >= ?";
+            $params[] = $fromDate;
+        }
+
+        if (!empty($toDate)) {
+            $conditions[] = "DATE(o.created_at) <= ?";
+            $params[] = $toDate;
+        }
+
+        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+
+        $stmt = $this->conn->prepare("
+            SELECT o.*, r.name as room_name
+            FROM orders o
+            LEFT JOIN rooms r ON o.room_id = r.id
+            {$whereSql}
+            ORDER BY o.created_at DESC
+        ");
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getById(int $orderId)
     {
         $stmt = $this->conn->prepare("

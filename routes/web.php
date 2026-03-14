@@ -96,6 +96,14 @@ switch ($uri) {
         $controller->deleteProduct();
         break;
 
+    case "/admin/orders":
+        require_once __DIR__ . "/../app/views/admin/orders.php";
+        break;
+
+    case "/admin/checks":
+        require_once __DIR__ . "/../app/views/admin/checks.php";
+        break;
+
     case "/admin/categories/create":
         require_once __DIR__ . "/../app/controllers/CategoryController.php";
         $controller = new CategoryController();
