@@ -2,10 +2,10 @@
 class Database
 {
     private $host = "127.0.0.1";
-    private $db = "cafeteria_db";
+    private $db = "cafeteria";
     private $user = "root";
-    private $pass = "root123";
-    private $port = "3307";
+    private $pass = "";
+    private $port = "3306";
 
     public function connect()
     {
