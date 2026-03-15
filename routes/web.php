@@ -206,8 +206,33 @@ switch ($uri) {
             } else {
                 header("Location: /my-orders?error=Order cannot be cancelled");
             }
-        } catch (Throwable $e) {
+} catch (Throwable $e) {
             header("Location: /my-orders?error=Failed to cancel order");
+        }
+        exit();
+        break;
+
+    case "/order/update-room":
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login");
+            exit();
+        }
+        $orderId = (int)($_POST['order_id'] ?? 0);
+        $roomId = (int)($_POST['room_id'] ?? 0);
+        if ($orderId <= 0 || $roomId <= 0) {
+            header("Location: /?error=Invalid order or room");
+            exit();
+        }
+        $controller = new OrderController($db);
+        try {
+            $updated = $controller->updateRoom($orderId, $roomId, (int)$_SESSION['user_id']);
+            if ($updated) {
+                header("Location: /?success=Room updated successfully!");
+            } else {
+                header("Location: /?error=Room update failed");
+            }
+        } catch (Throwable $e) {
+            header("Location: /?error=Failed to update room");
         }
         exit();
         break;

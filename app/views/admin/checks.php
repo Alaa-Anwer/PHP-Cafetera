@@ -80,15 +80,18 @@ $statusLabels = [
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Admin Checks</title>
-	<?php include __DIR__ . '/../layouts/jsCDN.php'; ?>
+<?php include __DIR__ . '/../layouts/jsCDN.php'; ?>
 	<style>
-		body {
-			background: #f4f6f9;
+   .card {
+			border: 1px solid #4E342E;
+			border-radius:14px;
+			overflow:hidden;
+			text-decoration: none;
 		}
 
-		.card {
-			border: none;
-			box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+		.card-header{
+			background:#4E342E;
+			color:#fff;
 		}
 
 		.user-avatar,
@@ -105,17 +108,88 @@ $statusLabels = [
 		.product-thumb {
 			border-radius: 8px;
 		}
+
+		.table thead{
+			background:#4E342E;
+			color:#fff;
+		}
+
+		.table th{
+			background:#4E342E;
+			color:#fff;
+			font-weight:600;
+			border:none;
+		}
+
+		.btn-action{
+			border-radius:20px;
+			padding:4px 12px;
+			font-size:0.85rem;
+			transition:all .25s ease;
+			border-color:#4E342E;
+			background:#4E342E;
+			color:#fff;
+		}
+
+		.btn-action:hover{
+			background:#6f4e37;
+			border-color:#6f4e37;
+			color:#fff;
+		}
+
+		.btn-view{
+			border-radius:20px;
+			padding:4px 12px;
+			font-size:0.85rem;
+			transition:all .25s ease;
+			border-color:#4E342E;
+			background:#4E342E;
+			color:#fff;
+		}
+
+		.btn-view:hover{
+			background:#6f4e37;
+			border-color:#6f4e37;
+			color:#fff;
+		}
+
+		.badge{
+			padding:6px 12px;
+			border-radius:20px;
+			font-size:0.8rem;
+		}
+
+		.alert{
+			border-radius:12px;
+		}
+				.btn-clear {
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    border: 1px solid #4E342E;
+    background: transparent;
+    color: #4E342E;
+		text-decoration: none;
+}
+
+	.btn-clear:hover {
+			background: #4E342E;
+			color: #fff;
+			border-color: #4E342E;
+			text-decoration: none;
+	}
 	</style>
 </head>
 
 <body>
 	<?php include __DIR__ . '/../layouts/navbar.php'; ?>
 
-	<div class="container py-4">
+<div class="container py-5">
 		<div class="card mb-4">
-			<div class="card-header bg-white">
+			<div class="card-header">
 				<h4 class="mb-0">Checks</h4>
-				<small class="text-muted">Users total spending with order drill-down</small>
+				<small class="text-white-50">Users total spending with order drill-down</small>
 			</div>
 
 			<div class="card-body border-bottom">
@@ -131,9 +205,9 @@ $statusLabels = [
 					<?php if ($selectedUserId > 0): ?>
 						<input type="hidden" name="user_id" value="<?= $selectedUserId ?>">
 					<?php endif; ?>
-					<div class="col-md-4 d-flex align-items-end gap-2">
-						<button type="submit" class="btn btn-primary">Filter</button>
-						<a href="/admin/checks" class="btn btn-outline-secondary">Clear</a>
+<div class="col-md-4 d-flex align-items-end gap-2">
+						<button type="submit" class="btn-clear">Filter</button>
+						<a href="/admin/checks" class="btn-clear" style="border-radius:20px;">Clear</a>
 					</div>
 				</form>
 			</div>
@@ -184,8 +258,8 @@ $statusLabels = [
 										<td><?= htmlspecialchars($user['user_email']) ?></td>
 										<td><?= (int)$user['orders_count'] ?></td>
 										<td><?= number_format((float)$user['total_spent'], 2) ?></td>
-										<td>
-											<a href="<?= htmlspecialchars($detailsUrl) ?>" class="btn btn-sm btn-outline-primary">
+<td>
+											<a href="<?= htmlspecialchars($detailsUrl) ?>" class="btn btn-sm btn-action">
 												View Orders
 											</a>
 										</td>
@@ -248,8 +322,8 @@ $statusLabels = [
 											<td><?= number_format((float)$order['total_price'], 2) ?></td>
 											<td><span class="badge bg-<?= $statusMeta['class'] ?>"><?= $statusMeta['label'] ?></span></td>
 											<td><?= date('M d, Y H:i', strtotime($order['created_at'])) ?></td>
-											<td>
-												<button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#<?= $detailsId ?>">
+<td>
+												<button class="btn btn-sm btn-view" type="button" data-bs-toggle="collapse" data-bs-target="#<?= $detailsId ?>">
 													View Items
 												</button>
 											</td>

@@ -66,15 +66,18 @@ $statusLabels = [
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Admin Orders</title>
-	<?php include __DIR__ . '/../layouts/jsCDN.php'; ?>
+<?php include __DIR__ . '/../layouts/jsCDN.php'; ?>
 	<style>
-		body {
-			background: #f4f6f9;
-		}
-
 		.card {
 			border: none;
-			box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+			border-radius:14px;
+			overflow:hidden;;
+		}
+
+		.card-header{
+			background:#4E342E;
+			color:#fff;
+			font-weight:600;
 		}
 
 		.order-items-table td,
@@ -96,18 +99,111 @@ $statusLabels = [
 		.product-thumb {
 			border-radius: 8px;
 		}
+
+		.table thead{
+			background:#4E342E;
+			color:#fff;
+		}
+
+		.table th{
+			background:#4E342E;
+			color:#fff;
+			font-weight:600;
+			border:none;
+		}
+
+		.page-title{
+			font-weight:700;
+			color:#4E342E;
+		}
+
+		.btn-action{
+			border-radius:20px;
+			padding:4px 12px;
+			font-size:0.85rem;
+			transition:all .25s ease;
+			border-color:#4E342E;
+			background:#4E342E;
+			color:#fff;
+		}
+
+		.btn-action:hover{
+			background:#6f4e37;
+			border-color:#6f4e37;
+			color:#fff;
+		}
+
+		.btn-update{
+			border-radius:20px;
+			padding:4px 12px;
+			font-size:0.8rem;
+			transition:all .25s ease;
+			border-color:#28a745;
+			background:#28a745;
+			color:#fff;
+		}
+
+		.btn-update:hover{
+			background:#218838;
+			border-color:#218838;
+			color:#fff;
+		}
+
+		.btn-view{
+			border-radius:20px;
+			padding:4px 12px;
+			font-size:0.85rem;
+			transition:all .25s ease;
+			border-color:#4E342E;
+			background:#4E342E;
+			color:#fff;
+		}
+
+		.btn-view:hover{
+			background:#6f4e37;
+			border-color:#6f4e37;
+			color:#fff;
+		}
+
+		.badge{
+			padding:6px 12px;
+			border-radius:20px;
+			font-size:0.8rem;
+		}
+
+		.alert{
+			border-radius:12px;
+		}
+
+		.btn-clear {
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    border: 1px solid #4E342E;
+    background: transparent;
+    color: #4E342E;
+		text-decoration: none;
+}
+
+	.btn-clear:hover {
+			background: #4E342E;
+			color: #fff;
+			border-color: #4E342E;
+			text-decoration: none;
+	}
 	</style>
 </head>
 
 <body>
 	<?php include __DIR__ . '/../layouts/navbar.php'; ?>
 
-	<div class="container py-4">
+<div class="container py-5">
 		<div class="card">
-			<div class="card-header bg-white d-flex justify-content-between align-items-center">
+			<div class="card-header d-flex justify-content-between align-items-center">
 				<div>
 					<h4 class="mb-0">Orders</h4>
-					<small class="text-muted">All users orders with order details</small>
+					<small class="text-white-50">All users orders with order details</small>
 				</div>
 			</div>
 
@@ -121,9 +217,9 @@ $statusLabels = [
 						<label class="form-label">To Date</label>
 						<input type="date" name="to" class="form-control" value="<?= htmlspecialchars($toDate) ?>">
 					</div>
-					<div class="col-md-4 d-flex align-items-end gap-2">
-						<button type="submit" class="btn btn-primary">Filter</button>
-						<a href="/admin/orders" class="btn btn-outline-secondary">Clear</a>
+<div class="col-md-4 d-flex align-items-end gap-2">
+						<button type="submit" class="btn-clear">Filter</button>
+						<a href="/admin/orders" class=" btn-clear">Clear</a>
 					</div>
 				</form>
 			</div>
@@ -203,13 +299,13 @@ $statusLabels = [
 														<option value="done" <?= $status === 'done' ? 'selected' : '' ?>>Done</option>
 														<option value="cancelled" <?= $status === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
 													</select>
-													<button type="submit" class="btn btn-sm btn-outline-success">Update</button>
+													<button type="submit" class="btn btn-sm btn-update">Update</button>
 												</form>
 											</div>
 										</td>
 										<td><?= date('M d, Y H:i', strtotime($order['created_at'])) ?></td>
 										<td>
-											<button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#<?= $detailsId ?>">
+<button class="btn btn-sm btn-view" type="button" data-bs-toggle="collapse" data-bs-target="#<?= $detailsId ?>">
 												View Items
 											</button>
 										</td>
